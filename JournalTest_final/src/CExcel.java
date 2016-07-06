@@ -20,46 +20,48 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 public class CExcel {
 	    
-	private String excelPath = ".";
-
-	private Workbook wb = null;
-	private List<String[]> dataList = new ArrayList<String[]>();
+	private String excelPath = ".";//存储当前表格所在路径（绝对路径）
+	private Workbook wb = null;  //存储当前表格，类型为workbook的变量
+	private List<String[]> dataList = new ArrayList<String[]>();//存储所有表格数据
 
 	CExcel(String excel) throws Exception {
 		/**
 		 * @param(in): excel file name
-		 * @CExcel构造函数，初始化
+		 * @CExcel构造函数，初始化，如果建立实例化失败则返回Exception
 		 * @return  CExcel类
 		 */
 		excelPath = excel;
 	
 		boolean isE2007 = false;    //判断是否是excel2007格式  
-        if(excelPath.endsWith("xlsx"))  
-            isE2007 = true;  
-        try {
-            FileInputStream input = new FileInputStream(excelPath);  //建立输入流  
-            //根据文件格式(2003或者2007)来初始化  
-            if(isE2007)  
-                wb = new XSSFWorkbook(input);  
-            else
-                wb = new HSSFWorkbook(input);
-        } catch (IOException e) {  
-        	e.printStackTrace(); 
-        }
+        	if(excelPath.endsWith("xlsx"))  
+            		isE2007 = true;  
+        	try {
+            	FileInputStream input = new FileInputStream(excelPath);  //建立输入流  
+            		//根据文件格式(2003或者2007)来初始化  
+            	if(isE2007)  
+                	wb = new XSSFWorkbook(input);  //2007版格式用扩展的XSSFWorkbook建立表格对象
+            	else
+                	wb = new HSSFWorkbook(input);
+        	} catch (IOException e) {  
+        		e.printStackTrace(); 
+        	}
 	}
 
 	public List<String[]> getAllBookData() {
+		/**
+		 * @function:读取当前工作表的所有活动页
+		 * @公共数据读取所有数据接口
+		 */
 		dataList.clear();
 		for(int i = 0; i < wb.getNumberOfSheets(); i++)
 			getAllData(i);
-		
 		return dataList;
 	}
 	
 	private List<String[]> getAllData(int sheetIndex){
 		/**
 		 * @param(in) sheetIndex(sheet index in excel)
-		 * @  取Excel第sheetIndex个sheet的所有数据，包含header
+		 * @  取Excel第sheetIndex个页的所有数据，包含header
 		 * @return  List<String[]>
 		 */
 		int columnNum = 0;
@@ -67,39 +69,34 @@ public class CExcel {
 		if(sheet.getRow(0)!=null){
 			columnNum = sheet.getRow(0).getLastCellNum()-sheet.getRow(0).getFirstCellNum();
 		}
-		if(columnNum>0){
+		if(columnNum>0){	
 			for(Row row:sheet){ 
 				String[] singleRow = new String[columnNum];
 				int n = 0;
-				for(int i=0;i<columnNum;i++){
+				for(int i=0;i<columnNum;i++){	//从第0列到第columnNum列进行数据读取
 					Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-					switch(cell.getCellType()){
-					case Cell.CELL_TYPE_BLANK:					//单元格为空
+					///分类读取每一列数据
+					switch(cell.getCellType()){	//根据每个单元格数据进行读取
+					case Cell.CELL_TYPE_BLANK:				//单元格为空
 						singleRow[n] = "";
 						break;
 					case Cell.CELL_TYPE_BOOLEAN:				//读取Boolean类型值
 						singleRow[n] = Boolean.toString(cell.getBooleanCellValue());
 						break;
 						
-					case Cell.CELL_TYPE_NUMERIC:               //读取数值
+					case Cell.CELL_TYPE_NUMERIC:               		//读取数值：为了防止数据精度丢失，本函数使用String类型读取
 						if(DateUtil.isCellDateFormatted(cell)){
 							singleRow[n] = String.valueOf(cell.getDateCellValue());
 						}else{ 
 							cell.setCellType(Cell.CELL_TYPE_STRING);
 							String temp = cell.getStringCellValue();
-							//判断是否包含小数点，如果不含小数点，则以字符串读取，如果含小数点，则转换为Double类型的字符串
-							//if(temp.indexOf(".")>-1){
-								//singleRow[n] = String.valueOf(new Double(temp)).trim();
-							//}else{
-								//singleRow[n] = temp.trim();
-							//}
 							singleRow[n] = temp;
 						}
 						break;
-					case Cell.CELL_TYPE_STRING:					//读取字符串
+					case Cell.CELL_TYPE_STRING:				//读取字符串
 						singleRow[n] = cell.getStringCellValue().trim();
 						break;
-					case Cell.CELL_TYPE_ERROR:					//读取错误，输出为空
+					case Cell.CELL_TYPE_ERROR:				//读取错误，输出为空
 						singleRow[n] = "";
 						break;  
 					case Cell.CELL_TYPE_FORMULA:				//读取公式类型
@@ -110,12 +107,12 @@ public class CExcel {
 						}
 						break;  
 					default:
-						singleRow[n] = "";
+						singleRow[n] = "";				//默认为空字符串
 						break;
 					}
 					n++;
 				} 
-				if("".equals(singleRow[0])){continue;}		//如果该行为空，跳过
+				if("".equals(singleRow[0])){continue;}				//如该行为空，跳过
 				dataList.add(singleRow);
 			}
 		}
@@ -123,20 +120,26 @@ public class CExcel {
 	}
 	
 	public int getBookRowNum() {
+		/**
+		 * @function: 表中包含的数据行数
+		 */
 		return dataList.size();
 	}
 	
 	private int getRowNum(int sheetIndex){
 		/**
-	 * @param(in) sheetIndex：Excel的Sheet指标
-	 * @返回Excel的第sheetIndex个Sheet的最大行index值，实际行数要加1
-	 * @return
-	 */
+	 	 * @param(in) sheetIndex：Excel的Sheet指标
+	 	 * @返回Excel的第sheetIndex个Sheet的最大行index值，实际行数要加1
+	 	 * @return
+	 	 */
 		Sheet sheet = wb.getSheetAt(sheetIndex);
 		return sheet.getLastRowNum();
 	}
 	
 	public int getBookColumnNum() {
+		/**
+		 * @function: 表中包含的列数
+		 */
 		return dataList.get(0).length;
 	}
 	
@@ -155,6 +158,10 @@ public class CExcel {
 	}
 	
 	public String[] getBookRowData(int rowIndex) {
+		/**
+		 * @param(in): 需要获取的行数
+		 * @function:读取数据第rowIndex行
+		 */
 		if(rowIndex < getBookRowNum())
 			return this.dataList.get(rowIndex);
 		else
@@ -179,7 +186,11 @@ public class CExcel {
 	
 
 	public String[] getBookColumnData(int colIndex) {
-		//getAllBookData();
+		/**
+		 * @param(in): 需要获取的列数
+		 * @function: 读取数据的第colIndex列
+		 */
+	
 		String[] dataArray = null;
 		if(getBookColumnNum() > colIndex)
 			dataArray = new String[getBookRowNum()];
@@ -221,7 +232,7 @@ public class CExcel {
 	}
 	
 	public boolean createNewExcelFile(List<String[]> result, String path) throws Exception {
-		/***
+		/**
 		 * @param(in): result, path：输出数据，存储路径
 		 * @将输出结果存储到结果excel表中
 		 * @return:存储成功/失败
@@ -270,11 +281,14 @@ public class CExcel {
 		return isCreateSuccess;
 	}
 	private CellStyle getStyle(Workbook workbook){
+		/**
+		 * @funtion: 获取工作表的格式
+		 */
 		CellStyle style = workbook.createCellStyle();
 		style.setAlignment(CellStyle.ALIGN_CENTER); 
 		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 		// 设置单元格字体
-		Font headerFont = workbook.createFont(); // 字体
+		
 		headerFont.setFontHeightInPoints((short)16);
 		headerFont.setColor(HSSFColor.BLACK.index);
 		headerFont.setFontName("宋体");
