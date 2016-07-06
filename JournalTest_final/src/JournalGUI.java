@@ -51,7 +51,12 @@ private static JRadioButton rdBtn_One;	//控制是否是单文件合并
 private static JRadioButton rdBtn_Batch;//控制是否是批文件处理
 
 private JournalGUI() {
-	initilization();
+	/**
+	 * @function: JournalGUI构造函数
+	 * @function: 初始化并创建控件响应，调用合并程序并输出结果
+	 */
+	initilization();	//调用初始化，创建窗口控件
+	
 btnOpen_1.addActionListener(new ActionListener(){
     //添加打开年度列表文件/文件夹程序
     public void actionPerformed(ActionEvent e) {
@@ -255,15 +260,19 @@ app.addWindowListener(new WindowAdapter() {
 		System.exit(0);
 	}
 });
-app.setSize(400,320);
-Dimension screensize=Toolkit.getDefaultToolkit().getScreenSize();
-int pos_x = (int)(screensize.getHeight()/2)- 200;
-int pos_y = (int)(screensize.getWidth() /2)- 160;
-//app.setLocation(pos_y, pos_x);
+app.setSize(400,320);	//指定窗口大小
+Dimension screensize=Toolkit.getDefaultToolkit().getScreenSize();//获取屏幕参数
+int pos_x = (int)(screensize.getHeight()/2)- 200;		//设置横向位置
+int pos_y = (int)(screensize.getWidth() /2)- 160;		//设置纵向位置
+app.setLocation(pos_y, pos_x);	//保证窗口起始位置为屏幕中央
 app.setVisible(true);
 }
 private static void initilization(){
-app = new JFrame("期刊列表合并演示");
+	/**
+	 * @function: 窗口初始化，创建窗口控件
+	 * @function: 构建一些确定性控件并确定其位置构造
+	 */
+	app = new JFrame("期刊列表合并演示");
 	
 	JLabel lblNewLabel = new JLabel("年度期刊列表文件夹");
 	
@@ -292,7 +301,7 @@ app = new JFrame("期刊列表合并演示");
 	
 	toolBar = new JToolBar();
 	toolBar.setFloatable(false);
-	lbLabel_result = new JLabel("                         ");
+	lbLabel_result = new JLabel("");
 	toolBar.add(lbLabel_result);
 	
 	JPanel panel = new JPanel();
@@ -392,7 +401,9 @@ app = new JFrame("期刊列表合并演示");
 }
 // Main function
 public static void main(String args[]) throws Exception {
+	///主程序入口
+	///调用窗口JournalGUI类，生成合并窗口实例
 	JournalGUI window =new JournalGUI();
-	window.getClass();
+	window.getClass();	//对主程序运行无影响，避免程序报错
 }
 }
