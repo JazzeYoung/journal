@@ -29,44 +29,43 @@ import javax.swing.JRadioButton;
 
 
 public class JournalGUI {
-private static String origTotal;
-private static String annual;
-private static String outFolder;
+private static String origTotal;	//总期刊列表路径
+private static String annual;		//年度期刊列表路径
+private static String outFolder;	//输出文件夹路径
 
-private static JTextField annualExcel;
-private static JTextField OrigExcel;
-private static JTextField OutputFiles;
-private static  JFrame app;
+private static JTextField annualExcel;	//输入年度期刊列表文件/文件夹控件
+private static JTextField OrigExcel;	//输入总期刊列表文件控件
+private static JTextField OutputFiles;	//获取输出目录的控件
+private static  JFrame app;		//生成的程序控制面板
 
-private static JButton btnOpen_1;
-private static JButton btnOpen_2 ;
-private static JButton btnOpen_3 ;
+private static JButton btnOpen_1;	//打开年度期刊列表选择对话框
+private static JButton btnOpen_2 ;	//打开总期刊列表选择对话框
+private static JButton btnOpen_3 ;	//打开输出目录选择对话框
 
-private static JButton btnCombine;
-private static JButton btnExit;
+private static JButton btnCombine;	//进行合并按钮控件
+private static JButton btnExit;		//退出程序按钮控件
 
-private static JToolBar toolBar;
-private static JLabel lbLabel_result;
-private static JRadioButton rdBtn_One;
-private static  JRadioButton rdBtn_Batch;
+private static JToolBar toolBar;	//输出工具条控件
+private static JLabel lbLabel_result;	//输出结果标签
+private static JRadioButton rdBtn_One;	//控制是否是单文件合并
+private static JRadioButton rdBtn_Batch;//控制是否是批文件处理
 
 private JournalGUI() {
 	initilization();
 btnOpen_1.addActionListener(new ActionListener(){
-    //
+    //添加打开年度列表文件/文件夹程序
     public void actionPerformed(ActionEvent e) {
-    	if(rdBtn_Batch.isSelected()) {
+    	if(rdBtn_Batch.isSelected()) {		//批文件处理模式下，选择年度期刊列表文件夹
         	JFileChooser chooser = new JFileChooser();
 	        chooser.setCurrentDirectory(new File("."));
         	chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        	
-	        int result =chooser.showDialog(chooser,"选择目标文件夹");
+	        int result =chooser.showDialog(chooser,"选择目标文件夹");	
 	        if(result==JFileChooser.APPROVE_OPTION){
 	            annual=chooser.getSelectedFile().getPath();
 	            annualExcel.setText(annual);
 	        }
         }
-        else if(rdBtn_One.isSelected()) {
+        else if(rdBtn_One.isSelected()) {	//单文件处理模式下，选择单个年度期刊列表文件
         	JFileChooser chooser = new JFileChooser();
 	        chooser.setCurrentDirectory(new File("."));
 	        chooser.setFileFilter(new FileNameExtensionFilter("Excel files", "xls", "xlsx"));
@@ -78,25 +77,27 @@ btnOpen_1.addActionListener(new ActionListener(){
 	        }
 	        
         }
-        else
+        else	//尚未选择处理方式，提示需要先进行模式选择
         	JOptionPane.showMessageDialog(app,"请选择合并文件形式！\n批处理/单文件合并", "Error", JOptionPane.ERROR_MESSAGE);
     }
 });
 btnOpen_2.addActionListener(new ActionListener(){
-    public void actionPerformed(ActionEvent e) {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new File("."));
-        chooser.setFileFilter(new FileNameExtensionFilter("Excel files", "xls", "xlsx"));
-        chooser.setAcceptAllFileFilterUsed(false);
-        int result =chooser.showDialog(chooser,"选择总期刊列表");
-        if(result==JFileChooser.APPROVE_OPTION){
-            origTotal=chooser.getSelectedFile().getPath();
-            OrigExcel.setText(origTotal);
-        }
-    }
+	///打开总期刊列表文件
+    	public void actionPerformed(ActionEvent e) {
+        	JFileChooser chooser = new JFileChooser();
+        	chooser.setCurrentDirectory(new File("."));
+        	chooser.setFileFilter(new FileNameExtensionFilter("Excel files", "xls", "xlsx"));
+        	chooser.setAcceptAllFileFilterUsed(false);
+        	int result =chooser.showDialog(chooser,"选择总期刊列表");
+        	if(result==JFileChooser.APPROVE_OPTION){
+            		origTotal=chooser.getSelectedFile().getPath();
+            		OrigExcel.setText(origTotal);
+        	}
+    	}
 });
 
 btnOpen_3.addActionListener(new ActionListener() {
+	///打开期刊列表合并结果储存位置
 	public void actionPerformed(ActionEvent e) {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setCurrentDirectory(new File("."));
@@ -106,11 +107,12 @@ btnOpen_3.addActionListener(new ActionListener() {
 		if(result==JFileChooser.APPROVE_OPTION){
 		    outFolder=chooser.getSelectedFile().getPath();
 		    OutputFiles.setText(outFolder);
-        }
+        	}
 	}
 });
 
 btnCombine.addActionListener(new ActionListener() {
+	///完成合并参数的传递与处理结果的显示
 	public void actionPerformed(ActionEvent e) {
 		if(annual == null || origTotal == null) {
 			JOptionPane.showMessageDialog(app,"请输入期刊列表！\n至少应输入年度期刊列表及总期刊列表", "Error", JOptionPane.ERROR_MESSAGE);
