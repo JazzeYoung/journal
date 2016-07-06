@@ -129,33 +129,26 @@ btnCombine.addActionListener(new ActionListener() {
 		progressBar.setStringPainted(true);
 		progressBar.setEnabled(false);
 		progressBar.setBorderPainted(false);
-		Timer timer0 = new Timer(0 , new ActionListener()  
-        {  
-            public void actionPerformed(ActionEvent e)  
-            {  
-                //以任务的当前完成量设置进度条的value  
-                if(rdBtn_Batch.isSelected())
-                	progressBar.setValue(0);  
-                lbLabel_result.setText("正在进行文件合并……");
-            }
-        });  
+		Timer timer0 = new Timer(0 , new ActionListener()
+	        {  ///保证程序开始的程序显示
+	            public void actionPerformed(ActionEvent e)  
+	            {  
+	                //以任务的当前完成量设置进度条的value  
+	                if(rdBtn_Batch.isSelected())
+	                	progressBar.setValue(0);  
+	                lbLabel_result.setText("正在进行文件合并……");
+	            }
+	        });  
 		if(rdBtn_Batch.isSelected()) {
 			progressBar.setEnabled(true);
 			progressBar.setBorderPainted(true);
 			toolBar.add(progressBar);
-			//final JournalCombine target = new JournalCombine();  
-	        
-	        //new Thread(target).start();  
-			
-	        //设置进度条的最大值和最小值,  
-	        progressBar.setMinimum(0);   
-	        //以总任务量作为进度条的最大值  
-	        progressBar.setMaximum(100);  
-	        
-	        timer0.start();
-	        
+			//设置进度条的最大值和最小值,  
+		        progressBar.setMinimum(0);   
+		        //以总任务量作为进度条的最大值  
+		        progressBar.setMaximum(100);  
 		}
-		
+		timer0.start();	//显示运行过程
 		final JournalCombine jTest;
 		String[] args = new String[4];
 		if(rdBtn_One.isSelected()) {
@@ -196,11 +189,11 @@ btnCombine.addActionListener(new ActionListener() {
 			return;
 		}
 		//以启动一条线程的方式来执行一个耗时的任务  
-		new Thread(jTest).start();
-		timer0.stop();
+		new Thread(jTest).start();	//开始执行jTest.run()程序并以新的线程不间断的运行下去
+		timer0.stop();	//停止“开始处理”显示
 		final Timer timer1 = new Timer(180000, new ActionListener(){
-			public void actionPerformed(ActionEvent e)  
-        	{
+			///进行目标是否为空的显示，增加时间延迟防止出现误判
+			public void actionPerformed(ActionEvent e) {
 				String file = jTest.getCurrentProg();
 				if(!jTest.getCurrentStat()){//jTest.current() == 0 || jTest.current()== 100) {
 					JOptionPane.showMessageDialog(app,"无法合并文件！", "Error", JOptionPane.ERROR_MESSAGE);
@@ -221,32 +214,32 @@ btnCombine.addActionListener(new ActionListener() {
 				if(rdBtn_Batch.isSelected()) {
 		                //以任务的当前完成量设置进度条的value
 		            	progressBar.setValue(jTest.current());
-		        }
-				timer1.stop();
+		        	}
+				timer1.stop();//合并成功，则停止判断是否失败
 			}
 			else {
-				timer1.start();
+				timer1.start();//延迟判断合并是否失败
 			}
 			
-        }
-			
-        });  
-        timer2.start();
-        final Timer timer3 = new Timer(1000, new ActionListener() {
-        	public void actionPerformed(ActionEvent e)  
-        	{
-        		if(jTest.current()==100 && jTest.getCurrentStat()) {
-        			lbLabel_result.setText("合并成功！");
-        			if(rdBtn_Batch.isSelected())
-        				progressBar.setValue(100);
-        			btnCombine.setEnabled(true);
-        			timer1.stop();
-        			timer2.stop();
-        		}
-        	}
-        	
-        });
-        timer3.start();
+	        }
+				
+	        });  
+	        timer2.start();
+	        final Timer timer3 = new Timer(1000, new ActionListener() {
+	        	public void actionPerformed(ActionEvent e)  
+	        	{
+	        		if(jTest.current()==100 && jTest.getCurrentStat()) {
+	        			lbLabel_result.setText("合并成功！");
+	        			if(rdBtn_Batch.isSelected())
+	        				progressBar.setValue(100);
+	        			btnCombine.setEnabled(true);
+	        			timer1.stop();
+	        			timer2.stop();
+	        		}
+	        	}
+	        	
+	        });
+	        timer3.start();
 	}
 });
 
