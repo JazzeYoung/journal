@@ -195,7 +195,7 @@ btnCombine.addActionListener(new ActionListener() {
 			///进行目标是否为空的显示，增加时间延迟防止出现误判
 			public void actionPerformed(ActionEvent e) {
 				String file = jTest.getCurrentProg();
-				if(!jTest.getCurrentStat()){//jTest.current() == 0 || jTest.current()== 100) {
+				if(!jTest.getCurrentStat()){
 					JOptionPane.showMessageDialog(app,"无法合并文件！", "Error", JOptionPane.ERROR_MESSAGE);
 					lbLabel_result.setText(file + "合并失败");
 					if(rdBtn_Batch.isSelected()) {
@@ -224,8 +224,9 @@ btnCombine.addActionListener(new ActionListener() {
 	        }
 				
 	        });  
-	        timer2.start();
+	        timer2.start();	//即可开始进行程序运行状态检测
 	        final Timer timer3 = new Timer(1000, new ActionListener() {
+	        	///最终状态检测定时器，定时检测是否已经完成全部程序
 	        	public void actionPerformed(ActionEvent e)  
 	        	{
 	        		if(jTest.current()==100 && jTest.getCurrentStat()) {
@@ -239,16 +240,16 @@ btnCombine.addActionListener(new ActionListener() {
 	        	}
 	        	
 	        });
-	        timer3.start();
+	        timer3.start();//开始进行定时检测
 	}
 });
 
-btnExit.addActionListener(new ActionListener() {
+btnExit.addActionListener(new ActionListener() {	//退出按钮
 	public void actionPerformed(ActionEvent e) {
 		System.exit(0);
 	}
 });
-app.addWindowListener(new WindowAdapter() {
+app.addWindowListener(new WindowAdapter() {		//关闭窗口
 	public void windowClosing(WindowEvent e) {
 		System.exit(0);
 	}
